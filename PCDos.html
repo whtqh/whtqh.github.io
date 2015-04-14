@@ -1,0 +1,499 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <meta name="Keywords" content="blog"/>
+    <meta name="Description" content="blog"/>
+    <title>Simple</title>
+    <link rel="shortcut icon" href="/static/favicon.png"/>
+    <link rel="stylesheet" type="text/css" href="/main.css" />
+</head>
+<body>
+<div class="main">
+    <div class="header">
+    	<ul id="pages">
+            <li><a href="/">home</a></li>
+            <li><a href="/#/tags">tags</a></li>
+            <li><a href="/#/archive">archive</a></li>
+    	</ul>
+    </div>
+	<div class="wrap-header">
+	<h1>
+    <a href="/" id="title"></a>
+	</h1>
+	</div>
+<div id="md" style="display: none;">
+<!-- markdown -->
+第二次计原实验报告 
+                                                 2011011341 李奇  自12
+一、	实验目的
+1.	巩固DEBUG及TASM的上机操作。
+2.	加强对运算指令的理解。
+3.	注意标志寄存器的变化。
+二、	实验内容
+1.	十六进制加减运算：
+在数据区中定义两个16位的二进制数(低字节在前高字节在后)。用8位加减运算指令分别计算这两个数的和、差，并将结果也存入数据区原始数据的后面。程序结束后返回DOS。汇编程序编写如下：
+DATAS SEGMENT    ;数据段开始
+BUFFER DW FFFFH, FFFEH, 0000H, 0000H
+DATAS ENDS       ;数据段结束
+
+STACKS SEGMENT   ;堆栈段开始
+	PARA DB 100 DUP(?)
+STACKS ENDS      ;堆栈段结束
+
+CODES SEGMENT
+    ASSUME CS:CODES,DS:DATAS,SS:STACKS
+START:
+    MOV AX,DATAS
+    MOV DS,AX    ;建立用户数据段
+    LEA SI, BUFFER
+    MOV BX, [SI]
+    ADD SI, 2
+    MOV CX, [SI]
+    PUSH BX      ;保留BX中内容
+    ADD BL, CL
+    ADC BH, CH
+    ADD SI, 2
+    MOV [SI], BX ;将和存入原始数据后面
+    POP BX
+    SUB BL, CL
+    SBB BH, CH
+    ADD SI, 2
+    MOV [SI], BX ;将差存入和的后面
+    MOV AH,4CH
+    INT 21H
+CODES ENDS
+ END START
+程序基本思路：将被加数与加数分别存放在AX与BX中，先将寄存器低字节进行加/减运算，影响到标志位CF后，再根据其对寄存器高字节进行加/减运算，结果送回数据区原始数据后面。
+注意需要考虑到“低字节在前，高字节在后”的存放规则。
+程序运行结果
+ 
+2.压缩BCD码的加减运算：
+在内容1的基础上修改程序实现压缩BCD码的加减运算。除数据类型外，其他均与内容1相同。汇编程序编写如下：
+
+DATAS SEGMENT    ;数据段开始
+BUFFER DW 1234H, 2478H, 0000H, 0000H
+DATAS ENDS       ;数据段结束
+
+STACKS SEGMENT   ;堆栈段开始
+	PARA DB 100 DUP(?)
+STACKS ENDS      ;堆栈段结束
+
+CODES SEGMENT
+    ASSUME CS:CODES,DS:DATAS,SS:STACKS
+START:
+    MOV AX,DATAS
+    MOV DS,AX    ;建立用户数据段
+    LEA SI, BUFFER
+    MOV BX, [SI]
+    ADD SI, 2
+    MOV CX, [SI]
+    PUSH BX      ;保留BX中内容
+    ADD SI, 2
+    ADD BL, CL
+    MOV AL, BL
+    DAA
+    MOV [SI], AL ;将和的低位存入原始数据后面
+    ADC BH, CH
+    MOV AL, BH
+    DAA
+    INC SI
+    MOV [SI], AL ;将和的高位存入数据段
+    POP BX
+    INC SI
+    SUB BL, CL
+    MOV AL, BL
+    DAS
+    MOV [SI], AL ;将差的低位存入数据段
+    SBB BH, CH
+    MOV AL, BH
+    DAS
+    INC SI
+    MOV [SI], AL ;将差的高位存入数据段
+    MOV AH,4CH
+    INT 21H
+CODES ENDS
+    END START
+该程序是在实验内容1的程序中，每次进行过8位加/减法之后，均进行一次加/减法的BCD码调整，确保结果格式仍为BCD码。
+注：实验内容1，2中均可以在DEBUG中修改运算的原始数据。方法是先用反汇编指令U获得当前内存数据段的段基址，然后用E命令改动内存(格式为 E address [list] )。改动后可以按与上面相同的步骤再运行程序，查看内存情况，观察不同数据的结果是否均符合。使用E命令程序运行后内存的情况为：
+ 
+2.	用重复累加的方法实现两位压缩BCD码乘以两位压缩BCD码的乘法运算：被乘数和乘数都用压缩BCD码形式存放于数据区，各占一单元。乘积顺序存放在后两个单元中（低位在前，高位在后）。汇编程序编写如下：
+DATAS SEGMENT    ;数据段开始
+BUFFER DB 12H, 12H, 00H, 00H
+DATAS ENDS       ;数据段结束
+
+STACKS SEGMENT   ;堆栈段开始
+	PARA DB 100 DUP(?)
+STACKS ENDS      ;堆栈段结束
+
+CODES SEGMENT
+    ASSUME CS:CODES,DS:DATAS,SS:STACKS
+MULTIPLY PROC FAR
+START:
+    MOV AX,DATAS
+    MOV DS,AX    ;建立用户数据段
+    LEA SI, BUFFER
+    MOV BL, [SI]
+    INC SI
+    MOV CL, [SI]
+    INC SI
+    MOV DX, 0    ;DX存放乘积结果，此处先置零
+    MOV BH, 0
+    MOV CH, 0
+JUDGE:
+	AND BL, 0FFH
+	JZ EXIT      ;如果BL为零输出结果
+	AND CL, 0FFH
+	JZ EXIT      ;如果CL为零输出结果
+MULTI:
+	ADD DX, BX
+	MOV AL, DL
+	DAA
+	ADC DH, 0
+	MOV DL, AL
+	MOV AL, DH
+	DAA
+	MOV DH, AL    ;将被乘数加到积上并对积的两个字节进行十进制调整
+	DEC CL        ;CL减1后进行十进制调整
+	MOV AL, CL
+	DAS
+	MOV CL, AL
+	JMP JUDGE
+EXIT:
+	MOV [SI], DX
+    MOV AH,4CH
+    INT 21H
+MULTIPLY ENDP
+CODES ENDS
+    END START
+程序基本思路是：START标号下的内容为计算前的基本操作，包括地址指针对应，寄存器置零等；JUDGE标号下的内容判断BL与CL是否为零，一旦有一个为零则跳到EXIT标号将结果存放至数据区并中断返回DOS；MULTI标号下的内容实现循环，即当BL、CL均不为零时，将BL中的被乘数与AL中的积相加，并进行十进制调整，之后回到START标号下继续循环，直至满足START的条件停止累加得到结果。
+程序运行后内存的情况为：
+ 
+选作：
+DATA SEGMENT
+BUFFER1 DB '4','5','7','2’¡¥    
+BUFFER2 DB '3'
+BUFFER3 DB 4 DUP(0)
+ORG 100H
+MESS DB 'HAVE DONE',13,10,'$’¡¥
+DATA ENDS
+STACKS    SEGMENT  PARA   STACK               
+DB          100 DUP(?)
+STACKS    ENDS                             
+CODES    SEGMENT                          
+ASSUME      CS:CODES,DS:DATA,SS:STACKS
+START:    MOV         AX,DATA            
+          MOV         DS,AX
+          MOV         ES,AX
+          LEA SI,BUFFER1
+          LEA DI,BUFFER2
+          MOV BL,[DI]
+          SUB BL,30H                     乘数进行十进制调整；
+          LEA DI,BUFFER3
+          MOV CX,4                     被乘数按位于超喜欢乘数相乘 ；
+NEXT:     MOV AL,[SI]
+          SUB AL,30H
+          MUL BL
+          AAM                           乘法的ASCII调整；
+          INC SI
+          ADD AL,[DI]            
+          AAA                             加法的ASCII调整；
+          MOV [DI],AL
+          INC DI
+          MOV [DI],AH
+          DEC CX
+          JNZ NEXT
+          MOV CX,4                   结果进行ASCII码调整之后再送存；
+NEXT2:    DEC DI                
+          ADD [DI],30H
+          DEC CX
+          JNZ NEXT2
+          LEA DX,MESS
+          MOV AH,9
+          INT 21H
+          MOV AH,4CH
+          INT 21H
+CODES     ENDS
+END       START
+程序的基本思路：先进行乘数的ASCII调整，在用循环与被乘数相乘，开始时不要忘记被乘数也要进行ASCII调整,在每得到一位结果时进行结果ASCII调整，注意存储结果时进位。最后要将结果转化为ASCII码送存。程序运行后的内存为：
+ 
+三：实验小结
+本次实验是第一次汇编语言程序的自行设计，在编写程序时首先应注意一些最基本的问题，如数据段、堆栈段的初始化，程序末的返回DOS中断等。只有在最基本的格式等方面确保无误才能进行以后的设计。因为汇编语言与计算机硬件联系紧密，在编写时应时刻注意各寄存器的状态，内存每个单元的状态，数据存放类型等，最好在容易犯糊涂的行末都作好注释，以使思路清晰，以后的调试和其他人的阅读带来方便。
+较复杂的程序编写前列写流程图是很好的习惯，可以帮助我们理清思路，明晰程序的总体框架。较大型的汇编语言程序需要在设计、编写、调试方面一丝不苟才能达到预期的较好效果，这还需要我们在以后的实验中多加练习。
+在以后的实验中，会更加注重代码的调试与书写方面的注意事项，在代码书写与程序调试的过程中，更加提高自己的分析问题与解决问题的能力，提高对计算机原理更深刻的认识。
+
+<!-- markdown end -->
+</div>
+<div class="entry" id="main">
+<!-- content -->
+<p>第二次计原实验报告 
+                                                 2011011341 李奇  自12
+一、    实验目的
+1.    巩固DEBUG及TASM的上机操作。
+2.    加强对运算指令的理解。
+3.    注意标志寄存器的变化。
+二、    实验内容
+1.    十六进制加减运算：
+在数据区中定义两个16位的二进制数(低字节在前高字节在后)。用8位加减运算指令分别计算这两个数的和、差，并将结果也存入数据区原始数据的后面。程序结束后返回DOS。汇编程序编写如下：
+DATAS SEGMENT    ;数据段开始
+BUFFER DW FFFFH, FFFEH, 0000H, 0000H
+DATAS ENDS       ;数据段结束</p>
+
+<p>STACKS SEGMENT   ;堆栈段开始
+    PARA DB 100 DUP(?)
+STACKS ENDS      ;堆栈段结束</p>
+
+<p>CODES SEGMENT
+    ASSUME CS:CODES,DS:DATAS,SS:STACKS
+START:
+    MOV AX,DATAS
+    MOV DS,AX    ;建立用户数据段
+    LEA SI, BUFFER
+    MOV BX, [SI]
+    ADD SI, 2
+    MOV CX, [SI]
+    PUSH BX      ;保留BX中内容
+    ADD BL, CL
+    ADC BH, CH
+    ADD SI, 2
+    MOV [SI], BX ;将和存入原始数据后面
+    POP BX
+    SUB BL, CL
+    SBB BH, CH
+    ADD SI, 2
+    MOV [SI], BX ;将差存入和的后面
+    MOV AH,4CH
+    INT 21H
+CODES ENDS
+ END START
+程序基本思路：将被加数与加数分别存放在AX与BX中，先将寄存器低字节进行加/减运算，影响到标志位CF后，再根据其对寄存器高字节进行加/减运算，结果送回数据区原始数据后面。
+注意需要考虑到“低字节在前，高字节在后”的存放规则。
+程序运行结果</p>
+
+<p>2.压缩BCD码的加减运算：
+在内容1的基础上修改程序实现压缩BCD码的加减运算。除数据类型外，其他均与内容1相同。汇编程序编写如下：</p>
+
+<p>DATAS SEGMENT    ;数据段开始
+BUFFER DW 1234H, 2478H, 0000H, 0000H
+DATAS ENDS       ;数据段结束</p>
+
+<p>STACKS SEGMENT   ;堆栈段开始
+    PARA DB 100 DUP(?)
+STACKS ENDS      ;堆栈段结束</p>
+
+<p>CODES SEGMENT
+    ASSUME CS:CODES,DS:DATAS,SS:STACKS
+START:
+    MOV AX,DATAS
+    MOV DS,AX    ;建立用户数据段
+    LEA SI, BUFFER
+    MOV BX, [SI]
+    ADD SI, 2
+    MOV CX, [SI]
+    PUSH BX      ;保留BX中内容
+    ADD SI, 2
+    ADD BL, CL
+    MOV AL, BL
+    DAA
+    MOV [SI], AL ;将和的低位存入原始数据后面
+    ADC BH, CH
+    MOV AL, BH
+    DAA
+    INC SI
+    MOV [SI], AL ;将和的高位存入数据段
+    POP BX
+    INC SI
+    SUB BL, CL
+    MOV AL, BL
+    DAS
+    MOV [SI], AL ;将差的低位存入数据段
+    SBB BH, CH
+    MOV AL, BH
+    DAS
+    INC SI
+    MOV [SI], AL ;将差的高位存入数据段
+    MOV AH,4CH
+    INT 21H
+CODES ENDS
+    END START
+该程序是在实验内容1的程序中，每次进行过8位加/减法之后，均进行一次加/减法的BCD码调整，确保结果格式仍为BCD码。
+注：实验内容1，2中均可以在DEBUG中修改运算的原始数据。方法是先用反汇编指令U获得当前内存数据段的段基址，然后用E命令改动内存(格式为 E address [list] )。改动后可以按与上面相同的步骤再运行程序，查看内存情况，观察不同数据的结果是否均符合。使用E命令程序运行后内存的情况为：</p>
+
+<ol>
+<li>用重复累加的方法实现两位压缩BCD码乘以两位压缩BCD码的乘法运算：被乘数和乘数都用压缩BCD码形式存放于数据区，各占一单元。乘积顺序存放在后两个单元中（低位在前，高位在后）。汇编程序编写如下：
+DATAS SEGMENT    ;数据段开始
+BUFFER DB 12H, 12H, 00H, 00H
+DATAS ENDS       ;数据段结束</li>
+</ol>
+
+<p>STACKS SEGMENT   ;堆栈段开始
+    PARA DB 100 DUP(?)
+STACKS ENDS      ;堆栈段结束</p>
+
+<p>CODES SEGMENT
+    ASSUME CS:CODES,DS:DATAS,SS:STACKS
+MULTIPLY PROC FAR
+START:
+    MOV AX,DATAS
+    MOV DS,AX    ;建立用户数据段
+    LEA SI, BUFFER
+    MOV BL, [SI]
+    INC SI
+    MOV CL, [SI]
+    INC SI
+    MOV DX, 0    ;DX存放乘积结果，此处先置零
+    MOV BH, 0
+    MOV CH, 0
+JUDGE:
+    AND BL, 0FFH
+    JZ EXIT      ;如果BL为零输出结果
+    AND CL, 0FFH
+    JZ EXIT      ;如果CL为零输出结果
+MULTI:
+    ADD DX, BX
+    MOV AL, DL
+    DAA
+    ADC DH, 0
+    MOV DL, AL
+    MOV AL, DH
+    DAA
+    MOV DH, AL    ;将被乘数加到积上并对积的两个字节进行十进制调整
+    DEC CL        ;CL减1后进行十进制调整
+    MOV AL, CL
+    DAS
+    MOV CL, AL
+    JMP JUDGE
+EXIT:
+    MOV [SI], DX
+    MOV AH,4CH
+    INT 21H
+MULTIPLY ENDP
+CODES ENDS
+    END START
+程序基本思路是：START标号下的内容为计算前的基本操作，包括地址指针对应，寄存器置零等；JUDGE标号下的内容判断BL与CL是否为零，一旦有一个为零则跳到EXIT标号将结果存放至数据区并中断返回DOS；MULTI标号下的内容实现循环，即当BL、CL均不为零时，将BL中的被乘数与AL中的积相加，并进行十进制调整，之后回到START标号下继续循环，直至满足START的条件停止累加得到结果。
+程序运行后内存的情况为：</p>
+
+<p>选作：
+DATA SEGMENT
+BUFFER1 DB '4','5','7','2’¡¥ <br>
+BUFFER2 DB '3'
+BUFFER3 DB 4 DUP(0)
+ORG 100H
+MESS DB 'HAVE DONE',13,10,'$’¡¥
+DATA ENDS
+STACKS    SEGMENT  PARA   STACK <br>
+DB          100 DUP(?)
+STACKS    ENDS <br>
+CODES    SEGMENT <br>
+ASSUME      CS:CODES,DS:DATA,SS:STACKS
+START:    MOV         AX,DATA <br>
+          MOV         DS,AX
+          MOV         ES,AX
+          LEA SI,BUFFER1
+          LEA DI,BUFFER2
+          MOV BL,[DI]
+          SUB BL,30H                     乘数进行十进制调整；
+          LEA DI,BUFFER3
+          MOV CX,4                     被乘数按位于超喜欢乘数相乘 ；
+NEXT:     MOV AL,[SI]
+          SUB AL,30H
+          MUL BL
+          AAM                           乘法的ASCII调整；
+          INC SI
+          ADD AL,[DI] <br>
+          AAA                             加法的ASCII调整；
+          MOV [DI],AL
+          INC DI
+          MOV [DI],AH
+          DEC CX
+          JNZ NEXT
+          MOV CX,4                   结果进行ASCII码调整之后再送存；
+NEXT2:    DEC DI <br>
+          ADD [DI],30H
+          DEC CX
+          JNZ NEXT2
+          LEA DX,MESS
+          MOV AH,9
+          INT 21H
+          MOV AH,4CH
+          INT 21H
+CODES     ENDS
+END       START
+程序的基本思路：先进行乘数的ASCII调整，在用循环与被乘数相乘，开始时不要忘记被乘数也要进行ASCII调整,在每得到一位结果时进行结果ASCII调整，注意存储结果时进位。最后要将结果转化为ASCII码送存。程序运行后的内存为：</p>
+
+<p>三：实验小结
+本次实验是第一次汇编语言程序的自行设计，在编写程序时首先应注意一些最基本的问题，如数据段、堆栈段的初始化，程序末的返回DOS中断等。只有在最基本的格式等方面确保无误才能进行以后的设计。因为汇编语言与计算机硬件联系紧密，在编写时应时刻注意各寄存器的状态，内存每个单元的状态，数据存放类型等，最好在容易犯糊涂的行末都作好注释，以使思路清晰，以后的调试和其他人的阅读带来方便。
+较复杂的程序编写前列写流程图是很好的习惯，可以帮助我们理清思路，明晰程序的总体框架。较大型的汇编语言程序需要在设计、编写、调试方面一丝不苟才能达到预期的较好效果，这还需要我们在以后的实验中多加练习。
+在以后的实验中，会更加注重代码的调试与书写方面的注意事项，在代码书写与程序调试的过程中，更加提高自己的分析问题与解决问题的能力，提高对计算机原理更深刻的认识。</p>
+<!-- content end -->
+</div>
+<br>
+<br>
+    <div id="disqus_thread"></div>
+	<div class="footer">
+		<p>© Copyright 2014 by isnowfy, Designed by isnowfy</p>
+	</div>
+</div>
+<script src="main.js"></script>
+<script src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+<script type="text/x-mathjax-config">
+    MathJax.Hub.Config({tex2jax: {inlineMath: [['$','$'], ["\\(", "\\)"]], processEscapes: true}});
+</script>
+<script id="content" type="text/mustache">
+    <h1>{{title}}</h1>
+    <div class="tag">
+    {{date}}
+    {{#tags}}
+    <a href="/#/tag/{{name}}">#{{name}}</a>
+    {{/tags}}
+    </div>
+</script>
+<script id="pagesTemplate" type="text/mustache">
+    {{#pages}}
+    <li>
+        <a href="{{path}}">{{title}}</a>
+    </li>
+    {{/pages}}
+</script>
+<script>
+$(document).ready(function() {
+    $.ajax({
+        url: "main.json",
+        type: "GET",
+        dataType: "json",
+        success: function(data) {
+            $("#title").html(data.name);
+            var pagesTemplate = Hogan.compile($("#pagesTemplate").html());
+            var pagesHtml = pagesTemplate.render({"pages": data.pages});
+            $("#pages").append(pagesHtml);
+            //path
+            var path = "PCDos.html";
+            //path end
+            var now = 0;
+            for (var i = 0; i < data.posts.length; ++i)
+                if (path == data.posts[i].path)
+                    now = i;
+            var post = data.posts[now];
+            var tmp = post.tags.split(" ");
+            var tags = [];
+            for (var i = 0; i < tmp.length; ++i)
+                if (tmp[i].length > 0)
+                    tags.push({"name": tmp[i]});
+            var contentTemplate = Hogan.compile($("#content").html());
+            var contentHtml = contentTemplate.render({"title": post.title, "tags": tags, "date": post.date});
+            $("#main").prepend(contentHtml);
+            if (data.disqus_shortname.length > 0) {
+                var disqus_shortname = data.disqus_shortname;
+                (function() {
+                    var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+                    dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+                    (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+                })();
+            }
+        }
+    });
+});
+</script>
+</body>
+</html>
