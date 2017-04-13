@@ -88,8 +88,7 @@ quickly is the goal here:</p>
 
 
 
-<script src="/js/jquery.min.js"></script>
-<script src="/js/bootstrap.js"></script>
+
 <script src="/js/d3.min.js"></script>
 <script src="/js/fmin.js"></script>
 <script src="/js/fmin_vis.js"></script>
