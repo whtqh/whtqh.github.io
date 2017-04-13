@@ -10,5 +10,8 @@ tags:
   - 生活
 ---
 我的个人博客上线了．
+
 啦啦啦啦啦~中二的WarHeat的个人博客：）
+
+<center><embed src="http://whtqh.github.io/images/pdf/Tsinghua_Hephaestus_Humanoid_AdultSize_regular_2017_Specs.pdf" width="850" height="600"></center>
 ... you can [get the PDF](http://whtqh.github.io/images/pdf/Tsinghua_Hephaestus_Humanoid_AdultSize_regular_2017_Specs.pdf) directly.
