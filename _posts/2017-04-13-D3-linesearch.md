@@ -11,51 +11,6 @@ tags:
 ---
 这是一个关于D3 API 的测试网页
 
- <head>
-    <meta charset="utf-8">
-    <title>Linesearch Gradient Example</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="">
-    <meta name="author" content="Ben Frederickson">
-    <link rel="stylesheet" href="../../css/bootstrap.min.css" />
-<style>
-
-.ticks {
-  font: 10px sans-serif;
-}
-
-.track,
-.track-inset,
-.track-overlay {
-  stroke-linecap: round;
-}
-
-.track {
-  stroke: #000;
-  stroke-opacity: 0.3;
-  stroke-width: 10px;
-}
-
-.track-inset {
-  stroke: #ddd;
-  stroke-width: 8px;
-}
-
-.track-overlay {
-  pointer-events: stroke;
-  stroke-width: 50px;
-  cursor: crosshair;
-}
-
-.handle {
-  fill: #fff;
-  stroke: #000;
-  stroke-opacity: 0.5;
-  stroke-width: 1.25px;
-}
-</style>
-
-</head>
 
 <div class="container">
 <div class = "row"><div class="col-md-6 col-md-offset-3">
