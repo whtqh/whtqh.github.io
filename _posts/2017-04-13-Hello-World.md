@@ -11,10 +11,10 @@ tags:
 ---
 我的个人博客上线了．
 
-啦啦啦啦啦~中二的WarHeat的个人博客：）
-![](/images/pdf/Tsinghua_Hephaestus_Humanoid_AdultSize_regular_2017_Specs.pdf)
+在这里会记录未来几年和Robot一起度过的时光~
+... You can [get our Team Description Paper](/images/pdf/TDP.pdf)
 <div class="post-comment">
     <center>
-        <embed src="http://whtqh.github.io/images/pdf/Tsinghua_Hephaestus_Humanoid_AdultSize_regular_2017_Specs.pdf" width="850" height="600">
+        <embed src="http://whtqh.github.io/images/pdf/TDP.pdf" width="600" height="800">
     </center>
 </div>
