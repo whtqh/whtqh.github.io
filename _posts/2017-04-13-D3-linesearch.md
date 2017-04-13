@@ -12,12 +12,6 @@ tags:
 这是一个关于D3 API 的测试网页
 
 
-<div class="container">
-<div class = "row"><div class="col-md-6 col-md-offset-3">
-
-
-<hr>
-
 <p> This graph attempts to show how a Wolfe Line Search works.
 The goal here is to move downwards along the gradient so that
 the loss is reduced sufficiently (controlled by the c1 parameter)
@@ -89,14 +83,9 @@ quickly is the goal here:</p>
 <div class="row">
     <div class ="iterations"></div>
 </div>
-</div></div>
+</div>
 </div>
 
-<hr>
-<br>
-
-</div>
-</div>
 
 
 <script src="/js/jquery.min.js"></script>
