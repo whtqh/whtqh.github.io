@@ -10,4 +10,4 @@ tags:
   - 生活
 ---
 我的个人博客上线了．
-... you can [get the PDF](images/pdf/Tsinghua_Hephaestus_Humanoid_AdultSize_regular_2017_Specs.pdf) directly.
+... you can [get the PDF](http://whtqh.github.io/images/pdf/Tsinghua_Hephaestus_Humanoid_AdultSize_regular_2017_Specs.pdf) directly.
