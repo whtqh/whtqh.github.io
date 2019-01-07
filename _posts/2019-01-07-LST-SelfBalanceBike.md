@@ -11,4 +11,9 @@ tags:
 
 自平衡车项目介绍：
 
-<iframe height=498 width=510 src="https://www.youtube.com/watch?v=FYYy9yJYrKs&t=1s" frameborder=0 allowfullscreen></iframe>
+
+
+结课实物视频：
+
+<iframe width="949" height="697" src="https://www.youtube.com/embed/FYYy9yJYrKs" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+
