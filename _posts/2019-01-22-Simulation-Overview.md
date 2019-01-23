@@ -33,7 +33,7 @@ tags:
 
 如图所示，要在仿真中描述一个机器人和环境（地面或者接触的物体）之间的交互，首先是要用描述语言将机器人的结构配置告诉仿真系统，其次仿真要能够计算动力学（关节空间到工作空间之间的换算关系，比如力矩和加速度）；同时还需要计算是否和环境有碰撞以及计算接触点的力（需要精确的Contact Model来建模）；还需要设计各个关节的控制器（对外的接口，需要关节角或者关节力矩作为输入），和机器人本体上的各种传感器（IMU测量某一个点的姿态和加速度等信息，关节角信息以及在关键的地方设置力和力矩传感器测量力信号）。最后就是人机交互所需要的界面和3D可视化的模块，这个对用户的体验也相当重要！
 
-总结一下，大概就是：(1) 模型载入功能，(2) 碰撞检测和接触模型，(3) 控制器，(4) 动力学仿真(ID&FD)，(5) 可视化
+总结一下，大概就是：(1) 模型载入功能，(2) 碰撞检测和接触模型，(3) 控制器，(4) 动力学仿真(ID or FD)，(5) 可视化
 
 以上是一个基本合格的动力学仿真系统所需要的，更高级的仿真系统无非是在计算规模上、精度还有实时画面的渲染效果上有更一步的表现。
 
@@ -61,53 +61,95 @@ https://en.wikipedia.org/wiki/Robotics_simulator
 
 动力学引擎：默认用ODE，新版本支持源码编译使用 Bullet(used in Gaming), DART(Computer Graphics and Robot Control), Simbody(used in Biomechanics)。
 
+个人评价：开源万岁！只是做动力学仿真的话没必要和ROS通信，用plugin搞定底层的运动控制即可，效果还可以。ROS1因为实时的问题被诟病了无数次...模型载入支持sdf和urdf。
+
 #### 2. V-Rep
 
-官网：
+官网：http://www.coppeliarobotics.com/
 
 平台：Mac/Linux/Win, 商业软件、教育版免费，各个平台下都差不多。
 
+动力学引擎：Bullet, ODE, Vortex, Newton Dynamics四种任意切换。但是V-REP官网也提示，并非是一个纯的动态仿真器，而是结合运动学和动力学的混合动力学模拟器：
+
+**It can rather be seen as a hybrid simulator that combines kinematics and dynamics in order to obtain the best performance for various simulation scenarios.**
+
+个人评价：**留空，用的不多，等入坑了再说**
+
 #### 3. Webots
 
-平台：
+官网：https://cyberbotics.com/
+
+平台：Win/Linux/Mac 全平台，
+
+动力学引擎：**extended version of the ODE**
+
+个人评价：最近Webots宣称开源了。。。不过他们的安装包体积是真的大，大而全的东西用在足式机器人这个小方向上效果值得商榷，现有的demo是NAO(https://www.youtube.com/watch?v=DDMky8PATKM)和SONY的Aibo。**留空，等尝试了再补充**
 
 #### 4. Choreonoid
+
+官网：http://choreonoid.org/
 
 平台：Linux/Win
 
 动力学引擎：默认AIST Engine，从源码编译能够实现ODE/Bullet/...
 
-HRP系列，
+个人评价：AIST为HRP系列开发，最近仍然在维护，但是日文资料更新的相对更快一点。需要定制化的功能就需要手动编译，因此需要对仿真的架构有一定的了解。自带SR-1走路的demo是一堆存在YAML里的关节角...
+
+**试着能不能手动导入自己的机器人，留空**
 
 #### 5. Simscape Multibody
 
+官网：https://ww2.mathworks.cn/products/simmechanics.html
+
 平台：Linux/Mac/Win
 
-MATLAB商业软件包之一
+动力学引擎：MATLAB自带
+
+个人评价：MATLAB商业软件包之一，啥事都能干系列，和simulink类似的模块流程图，便于设计控制器和调试。唯一的不足是算法设计完毕之后移植到C++平台比较麻烦。
 
 #### 6. Mujoco
 
-平台：
+官网：http://www.mujoco.org/
 
-#### 7. Bullet Based(PyBullet)
+平台：Win/Linux/Mac
 
-平台：
+动力学引擎：MuJoCo 
 
-动力学引擎：Bullet
+个人评价：MuJoco本身是一个库，同时也有对应的GUI，可以基于C++做很多定制化的操作，同时还能和Unity渲染结合，提供更好的世界效果。但是其仿真的效果过于接近动画，以及对碰撞的处理貌似偷了个小懒？总之AI的人(OpenAI Gym)特别喜欢用这个不是那么真实的仿真。
 
-#### 8. OpenAI Gym
+#### 7. PyBullet
 
-平台：
+官网：https://pybullet.org/wordpress/
 
-动力学引擎：Mujoco/DART
+平台：有python即可
 
-#### 9. ADAMS
+动力学引擎： Bullet Physics SDK
 
+个人评价：成名作，RSS18-Sim-to-Real 让四足跑起来，AI届从仿真走向实物的一小步，也是传统locomotion需要借鉴和学习的。19年初ETH的四足在Science 子刊上发的文章也是用学习和DRL做的，平台看上去像是Bullet基础上加入自己的接触模型。**值得学习**
 
+#### 8. ADAMS
 
+官网：http://www.mscsoftware.com/product/adams
 
+平台：windows/ Red Hat(Linux)
 
+动力学引擎：商业软件
 
+个人评价：ADAMS很成熟，做足式绰绰有余，但是有点过于强大。
+
+#### 9. RecurDyn
+
+官网：https://functionbay.com/en/page/single/171/recurdyn-5advantages
+
+平台：Windows
+
+动力学引擎：商业
+
+个人评价：**没用过，韩国公司的产品，感觉用在足式也是大材小用**
+
+#### 10. 待填
+
+...
 
 ### Reference
 
