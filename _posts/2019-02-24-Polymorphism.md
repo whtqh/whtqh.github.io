@@ -1,15 +1,15 @@
 ---
-title: 机器人仿真填坑计划
+title: C++基础——多态
 date: 2019-02-24 15:15:23 +0800
 layout: post
 permalink: /blog/2019/02/24/polymorphism.html
 categories:
-​	- 代码基础
+	- 代码基础
 tags:
-​	- C++
+	- C++
 ---
 
-## 多态(polymorphism)
+#多态(polymorphism)
 
 ### 虚函数实现多态
 
