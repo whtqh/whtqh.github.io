@@ -9,7 +9,7 @@ tags:
   - Modern Robotics
 ---
 
-# Modern Robotics: Ch2-Configuration Space(C-Space)
+# Ch2-Configuration Space(C-Space)
 
 ## Summary:
 
