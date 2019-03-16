@@ -84,7 +84,7 @@ e^{M^{-1}PM} = M^{-1} e^{P} M\\
 =e^{[S_1]\theta_1}...Me^{M^{-1}[S_n]M\theta_n}M^{-1}M \\
 =Me^{M^{-1}[S_1]M\theta_1}M^{-1}...Me^{M^{-1}[S_{n-1}]M\theta_{n-1}}e^{M^{-1}[S_n]M\theta_n} \\
 =Me^{M^{-1}[S_1]M\theta_1}...e^{M^{-1}[S_n]M\theta_n} \\
-=Me^{{\mathcal{B}_1}\theta_1}...e^{{\mathcal{B}_n}\theta_n}
+=Me^{\mathcal{B}_1 \theta_1}...e^{\mathcal{B}_n \theta_n}
 $$
 
 
