@@ -2,7 +2,7 @@
 title: Modern robotics Chapter 4
 date: 2019-03-16 23:18:23 +0800
 layout: post
-permalink: /blog/2019/03/16/ModernRoboticsCh4.html
+permalink: /blog/2019/03/16/ModernRoboticsch4.html
 categories:
   - 机器人学
 tags:
