@@ -220,9 +220,9 @@ https://github.com/NxRLab/ModernRobotics/blob/master/doc/MRlib.pdf
 
 
 
-...  [我的github仓库也有备份](>点击<)
+...  [我的github仓库也有备份](/images/pdf/MRlib.pdf)
 <div class="post-comment">
     <center>
-        <embed src="https://github.com/whtqh/image_files/blob/master/MRlib.pdf" width="600" height="890">
+        <embed src="http://whtqh.github.io/images/pdf/MRlib.pdf" width="600" height="890">
     </center>
 </div>
