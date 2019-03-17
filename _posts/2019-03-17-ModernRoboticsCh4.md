@@ -118,3 +118,111 @@ $$
 ![Fig2](https://raw.githubusercontent.com/whtqh/image_files/master/ModernRobo_CH4_Fig2.jpg)
 
 
+
+最后再来简单解释下实际的代码实现（以Matlab代码为例）
+
+**https://github.com/NxRLab/ModernRobotics**
+
+
+
+```matlab
+function T = FKinSpace(M, Slist, thetalist)
+% *** CHAPTER 4: FORWARD KINEMATICS ***
+% https://github.com/NxRLab/ModernRobotics
+% Takes M: the home configuration (position and orientation) of the 
+%          end-effector,
+%       Slist: The joint screw axes in the space frame when the manipulator
+%              is at the home position,
+%       thetalist: A list of joint coordinates.
+% Returns T in SE(3) representing the end-effector frame, when the joints 
+% are at the specified coordinates (i.t.o Space Frame).
+% Example Inputs:
+% 
+% clear; clc;
+% M = [[-1, 0, 0, 0]; [0, 1, 0, 6]; [0, 0, -1, 2]; [0, 0, 0, 1]];
+% Slist = [[0; 0;  1;  4; 0;    0], ...
+%        [0; 0;  0;  0; 1;    0], ...
+%        [0; 0; -1; -6; 0; -0.1]];
+% thetalist =[pi / 2; 3; pi];
+% T = FKinSpace(M, Slist, thetalist)
+% 
+% Output:
+% T =
+%   -0.0000    1.0000         0   -5.0000
+%    1.0000    0.0000         0    4.0000
+%         0         0   -1.0000    1.6858
+%         0         0         0    1.0000
+
+T = M;
+for i = size(thetalist): -1: 1
+    T = MatrixExp6(VecTose3(Slist(:, i) * thetalist(i))) * T;
+end
+end
+```
+
+
+
+VecTose3 实现比较简单，套用se(3)的定义就行
+
+MatrixExp6的实现稍微复杂一点点，但仍然是定义，首先是把se3中的so3转化为twist，然后单位化得到axis的omegahat和theta，然后omegahat对应的[omegahat]只需要对so3单位化即可（除以theta），最后按照定义，拼成指数的结果T矩阵：
+
+
+
+```matlab
+function T = MatrixExp6(se3mat)
+% *** CHAPTER 3: RIGID-BODY MOTIONS ***
+% Takes a se(3) representation of exponential coordinates.
+% Returns a T matrix in SE(3) that is achieved by traveling along/about the 
+% screw axis S for a distance theta from an initial configuration T = I.
+
+omgtheta = so3ToVec(se3mat(1: 3, 1: 3));
+if NearZero(norm(omgtheta))
+    T = [eye(3), se3mat(1: 3, 4); 0, 0, 0, 1];
+else
+    [omghat, theta] = AxisAng3(omgtheta);
+    omgmat = se3mat(1: 3, 1: 3) / theta; 
+    T = [MatrixExp3(se3mat(1: 3, 1: 3)), ...
+         (eye(3) * theta + (1 - cos(theta)) * omgmat ...
+          + (theta - sin(theta)) * omgmat * omgmat) ...
+            * se3mat(1: 3, 4) / theta;
+         0, 0, 0, 1];
+end
+end
+```
+
+
+
+MatrixExp3 就是求对应的R矩阵： 也是先求 “unit" screw axis
+
+```matlab
+function  R = MatrixExp3(so3mat)
+% *** CHAPTER 3: RIGID-BODY MOTIONS ***
+% Takes a 3x3 so(3) representation of exponential coordinates.
+% Returns R in SO(3) that is achieved by rotating about omghat by theta 
+% from an initial orientation R = I.
+
+omgtheta = so3ToVec(so3mat);
+if NearZero(norm(omgtheta))
+    R = eye(3);
+else
+    [omghat, theta] = AxisAng3(omgtheta);
+    omgmat = so3mat / theta;
+    R = eye(3) + sin(theta) * omgmat + (1 - cos(theta)) * omgmat * omgmat;
+end
+end
+```
+
+
+
+官方对变量名和对应的库函数有手册来解释：
+
+https://github.com/NxRLab/ModernRobotics/blob/master/doc/MRlib.pdf
+
+
+
+...  [我的github仓库也有备份](>点击<)
+<div class="post-comment">
+    <center>
+        <embed src="https://github.com/whtqh/image_files/blob/master/MRlib.pdf" width="600" height="890">
+    </center>
+</div>
