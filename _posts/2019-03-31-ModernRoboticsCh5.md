@@ -169,7 +169,7 @@ $$
 
 $$
 [\mathcal{V}_b]=T^{-1}\dot{T}\\
-T(\theta)=Me^{{\mathcal{B}_1}\theta_1}...e^{{\mathcal{B}_n}\theta_n} \\
+T(\theta)=Me^{\mathcal{B}_1 \theta_1}...e^{ \mathcal{B}_n\theta_n} \\
 \to \\
 [\mathcal{V}_b]=[\mathcal{B}_n]\dot{\theta}_{n}+
 e^{-[\mathcal{B}_n]\theta_n}[\mathcal{B}_{n-1}]e^{[\mathcal{B}_n]\theta_n}\dot{\theta}_{n-1}+...
