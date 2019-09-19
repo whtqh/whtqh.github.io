@@ -80,7 +80,7 @@ Walker1刚发布的时候，外观上没有手，只有两个大长腿，我内�
 
 ##### Conference
 
-[Humanoid 2018: Human-like ZMP Generator and Walking Stabilizer based on Divergent Component of Motion](/images/pdf/humanoids18-0193.pdf)
+[Humanoid 2018: Human-like ZMP Generator and Walking Stabilizer based on Divergent Component of Motion](/images/pdf/humanoids18_0193.pdf)
 
 [ROBIO 2017: A Robust Biped Gait Controller Using Step Timing Optimization with Fixed Footprint Constraints](/images/pdf/robio17-293.pdf)
 
