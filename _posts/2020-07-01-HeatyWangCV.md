@@ -78,3 +78,19 @@ Walker1刚发布的时候，外观上没有手，只有两个大长腿，我内�
 
 
 
+##### Conference
+
+[Humanoid 2018: Human-like ZMP Generator and Walking Stabilizer based on Divergent Component of Motion](/images/pdf/humanoids18-0193.pdf)
+
+[ROBIO 2017: A Robust Biped Gait Controller Using Step Timing Optimization with Fixed Footprint Constraints](/images/pdf/robio17-293.pdf)
+
+
+
+##### Technical Report
+
+[RoboCup 2019: Tsinghua Hephaestus 2019 AdultSize Team Description](/images/pdf/Tsinghua_Hephaestus_TDP_2019.pdf)
+
+[RoboCup 2018: Tsinghua Hephaestus 2018 AdultSize Team Description](/images/pdf/Tsinghua_Hephaestus_TDP_2018.pdf)
+
+[RoboCup 2017: Tsinghua Hephaestus 2017 AdultSize Team Description](/images/pdf/Tsinghua_Hephaestus_TDP_2017.pdf)
+
