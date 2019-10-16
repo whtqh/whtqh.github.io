@@ -66,14 +66,24 @@ vpa(invTau,4)
 这里主要的坑在于惯性矩阵（Spatial Inertial Matrix）的计算，urdf默认的惯性张量是相对于质心的，而Screw的方法一般将link的坐标系建立在前端关节上，需要在计算Inertia和Glist的时候做一个转换：
 
 惯性张量由于是3*3的矩阵，直接按照平移定理，q和b坐标系平行，q在{b}系的坐标为q（列向量）
+
+
 $$
 \mathcal{I}_{q}=\mathcal{I}_{b}+\mathfrak{m}\left(q^{\mathrm{T}} q I-q q^{\mathrm{T}}\right)
 $$
+
+
 而Spatial Inertial的坐标变换则需要用到adjoint变换（这里同样只是平移，R=eye(3)）：
+
+
 $$
 \mathcal{G}_{a}=\left[\operatorname{Ad}_{T_{b a}}\right]^{\mathrm{T}} \mathcal{G}_{b}\left[\operatorname{Ad}_{T_{b a}}\right] \\= \left[\begin{array}{cc}{R} & {0} \\ {[p] R} & {R}\end{array}\right]^T\mathcal{G}_{b}\left[\begin{array}{cc}{R} & {0} \\ {[p] R} & {R}\end{array}\right] \\=\left[\begin{array}{cc}{\mathcal{I}_{b}} & {[p]^{T}\cdot mI_{3\times3}} \\ {m{I}_{3\times3}\cdot [p]} & {mI_{3\times3}}\end{array}\right]
 $$
+
+
 利用mr_lib的matlab脚本：
+
+
 
 ```matlab
 j1_rpy = [0, 0 , 0];        j1_xyz = [0,0, 0.1575]';
