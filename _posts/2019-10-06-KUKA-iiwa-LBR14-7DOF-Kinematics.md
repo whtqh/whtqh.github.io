@@ -69,6 +69,7 @@ $$
 总而言之，DH能干的事，PoE都能干，DH设计的目的是为了节约参数，仅此而已（还导致相邻关节平行会有奇异等等问题，导致了魔改版本加 \beta角）。
 
 
+
 $$
 T_{i-1,i} = ^{i-1}T_{i}=\left(\operatorname{Rot}_{x_{i-1}}\left(\alpha_{i-1}\right) \cdot \operatorname{Trans}_{x_{i-1}}\left(a_{i-1}\right)\right) \cdot \left(\operatorname{Rot}_{z_{i}}\left(\theta_{i}\right) \cdot \operatorname{Trans}_{z_{i}}\left(d_{i}\right)\right) \\
 M_i =\left(\operatorname{Rot}_{x_{i-1}}\left(\alpha_{i-1}\right) \cdot \operatorname{Trans}_{x_{i-1}}\left(a_{i-1}\right)\right) \cdot  \operatorname{Trans}_{z_{i}}\left(d_{i}\right) \\
@@ -78,7 +79,9 @@ T_{0, n}=M_{1} e^{\left[\mathcal{A}_{1}\right] \theta_{1}} M_{2} e^{\left[\mathc
 $$
 
 
+
 因为每个joint的转动/平动都可以表示为[Ai]，在joint坐标系内的screw又可以通过坐标变换（Ad）转换为{0}坐标系下的screw：
+
 
 
 $$
@@ -87,7 +90,9 @@ $$
 $$
 
 
+
 因此只考虑FK计算末端的位姿的话，PoE貌似更方便？（感觉PoE的计算复杂度也并不是很高吗，本质上也还是齐次变换矩阵连乘，然后PoE的通用性会更加好一点）
+
 
 
 $$
@@ -96,6 +101,7 @@ e^{[\mathcal{S}] \theta}=\left[\begin{array}{cc}{e^{[\omega] \theta}} & {\left(I
 e^{[\hat{\omega}]\theta} = I+sin{\theta}[\hat{\omega}] + (1-cos{\theta})[\hat{\omega}]^2 \\
 = \left[\begin{array}{ccc}{\mathrm{c}_{\theta}+\hat{\omega}_{1}^{2}\left(1-\mathrm{c}_{\theta}\right)} & {\hat{\omega}_{1} \hat{\omega}_{2}\left(1-\mathrm{c}_{\theta}\right)-\hat{\omega}_{3} \mathrm{s}_{\theta}} & {\hat{\omega}_{1} \hat{\omega}_{3}\left(1-\mathrm{c}_{\theta}\right)+\hat{\omega}_{2} \mathrm{s}_{\theta}} \\ {\hat{\omega}_{1} \hat{\omega}_{2}\left(1-\mathrm{c}_{\theta}\right)+\hat{\omega}_{3} \mathrm{s}_{\theta}} & {\mathrm{c}_{\theta}+\hat{\omega}_{2}^{2}\left(1-\mathrm{c}_{\theta}\right)} & {\hat{\omega}_{2} \hat{\omega}_{3}\left(1-\mathrm{c}_{\theta}\right)-\hat{\omega}_{1} \mathrm{s}_{\theta}} \\ {\hat{\omega}_{1} \hat{\omega}_{3}\left(1-\mathrm{c}_{\theta}\right)-\hat{\omega}_{2} \mathrm{s}_{\theta}} & {\hat{\omega}_{2} \hat{\omega}_{3}\left(1-\mathrm{c}_{\theta}\right)+\hat{\omega}_{1} \mathrm{s}_{\theta}} & {\mathrm{c}_{\theta}+\hat{\omega}_{3}^{2}\left(1-\mathrm{c}_{\theta}\right)}\end{array}\right]
 $$
+
 
 
 个人认为FK中，为了通用性和易于理解，PoE>DH，至于别的地方，哪个好用用哪个吧~~
@@ -115,12 +121,15 @@ $$
 这样无论是通过几何法还是分离末端位置和姿态矩阵，都能够得到逆解的方法：
 
 
+
 $$
 T_{0,6}=T_{0,3}T_{3,6}
 $$
 
 
+
 当然使用旋量计算时同样能够利用该性质，这里先用几何法解释。
+
 
 
 $$
@@ -128,7 +137,9 @@ $$
 $$
 
 
+
 利用三角关系，以及肩到腕的距离x_sw，可列等式：
+
 
 
 $$
@@ -136,7 +147,9 @@ $$
 $$
 
 
+
 由于臂角变化时，肘关节并不变（三角形也不变），可以用臂角\phi和旋转轴来描述这个旋转矩阵：
+
 
 
 $$
@@ -144,7 +157,9 @@ $$
 $$
 
 
+
 因为是世界坐标系下的旋转（左乘），最终三角形上的link的{0}参考系下旋转矩阵可以描述为j3=0时的矩阵左乘臂角矩阵：
+
 
 
 $$
@@ -154,12 +169,15 @@ $$
 $$
 
 
+
 ##### 肘角 Joint 4
+
 
 
 $$
 \cos \theta_{4}=\frac{\left\|^{0} \boldsymbol{x}_{s w}\right\|^{2}-d_{s e}^{2}-d_{e w}^{2}}{2 d_{s e} d_{e w}} = \frac{\left\| ^{0} \boldsymbol{x}_{7}-^{0} \boldsymbol{l}_{b s}-^{0} \boldsymbol{R}_{7} ~^{7} \boldsymbol{l}_{w t} \right\|^{2}-d_{s e}^{2}-d_{e w}^{2}}{2 d_{s e} d_{e w}}
 $$
+
 
 
 肘角通常有两个解（正负）
@@ -169,6 +187,7 @@ $$
 由于末端位置和姿态已知，可以轻松计算出x_sw在{0}系下的坐标
 
 
+
 $$
 \begin{aligned}^{0} \boldsymbol{x}_{s w} &= ^{0}\boldsymbol{R}_{3}\left(^{3} \boldsymbol{l}_{s e}+^{3} \boldsymbol{R}_{4}^{4} \boldsymbol{l}_{e w}\right) \\
 &= \left.^{0} \boldsymbol{R}_{1}^{ini} ~ ^{1}\boldsymbol{R}_{2}^{ini}~^{2} \boldsymbol{R}_{3}\right|_{\theta_{3}=0}\left(^{3} l_{s e}+^{3} \boldsymbol{R}_{4}~^{4} l_{e w}\right)
@@ -176,7 +195,9 @@ $$
 $$
 
 
+
 等式右侧未知量为两个，也即初始的\theta_1,\theta_2，该矩阵等式，可以解得初始的\theta_1,\theta_2以及初始的矩阵R_3^{ini}
+
 
 
 $$
@@ -187,7 +208,9 @@ $$
 $$
 
 
+
 然后我们再规定臂角为已知，则可以求得对应臂角下的\theta_1,2,3：
+
 
 
 $$
@@ -198,7 +221,9 @@ $$
 $$
 
 
+
 右侧\phi假设已知，左侧未知量为\theta_1,\theta_2，\theta_3，则很容易求\theta_1,2,3，Paper上的Trans：
+
 
 
 $$
@@ -206,7 +231,9 @@ $$
 $$
 
 
+
 【此处使用PoE的坐标】，计算FK验证通过，使用Matlab syms计算T03，发现也存在类似的能够计算的特点
+
 
 
 $$
@@ -217,7 +244,9 @@ R_{0,3}=\left[\begin{array}{ccc}
 $$
 
 
+
 ##### Wrist（姿态计算Joint 5 6 7）
+
 
 
 $$
@@ -225,7 +254,9 @@ $$
 $$
 
 
+
 由符号运算可以得到R_{4,7}关于\theta{5,6,7}的矩阵:
+
 
 
 $$
@@ -234,6 +265,7 @@ R_{4,7}=\left[\begin{array}{ccc}
 {-s_6c_7} & {s_6s_7} & {c_6} \\ 
 {-s_5c_6c_7-c_5s_7} & {-c_5c_7+s_5c_6s_7} & {-s_5s_6}\end{array}\right]
 $$
+
 
 
 得到\theta{5,6,7}的计算公式（围绕R_47和Aw,Bw,Cw的矩阵等式进行计算）
@@ -267,6 +299,8 @@ Singularity 在Chapt. II.E和Chapt. III.A中有详细的讨论：
 大致可以按照tan, cos分为两类
 
 a) tan， theta 1,3,5,7，求解公式大致相似：
+
+
 $$
 \tan \theta_{i}=\frac{f_{n}(\psi)}{f_{d}(\psi)}\\
 \begin{aligned} 
@@ -274,30 +308,43 @@ f_{n}(\psi) &=a_{n} \sin \psi+b_{n} \cos \psi+c_{n} \\
 f_{d}(\psi) &=a_{d} \sin \psi+b_{d} \cos \psi+c_{d} 
 \end{aligned}
 $$
+
+
 左右两边各求微分，可以得到\theta关于臂角的导数，从而能够发现导数始终存在
+
+
 $$
 \frac{d \theta_{i}}{d \psi}=\frac{a_{t} \sin \psi+b_{t} \cos \psi+c_{t}}{f_{n}^{2}(\psi)+f_{d}^{2}(\psi)} \\
 \begin{aligned} a_{t} &=b_{d} c_{n}-b_{n} c_{d} \\ b_{t} &=a_{n} c_{d}-a_{d} c_{n} \\ c_{t} &=a_{n} b_{d}-a_{d} b_{n} \end{aligned}
 $$
+
+
 对at,bt,ct的关系讨论，导数是否存在等于0的情况可以将theta1,3,5,7的值分为三种情况：
 
 - 周期波动（存在不同的导数为0的解）；
+- 
 
 $$
 \begin{array}{l}{\psi_{0}^{-}=2 \tan ^{-1} \frac{a_{t}-\sqrt{a_{t}^{2}+b_{t}^{2}-c_{t}^{2}}}{b_{t}-c_{t}}} \\ 
 {\psi_{0}^{+}=2 \tan ^{-1} \frac{a_{t}+\sqrt{a_{t}^{2}+b_{t}^{2}-c_{t}^{2}}}{b_{t}-c_{t}}}\end{array}
 $$
 
+
+
 极大值和极小值在以上两个值取到。
 
 - 单调（并在-pi~pi内无间断点）或者 两段单调（pi->-pi的穿越），此时导数始终不等于0；
 - 两段单调单纯的加/减了pi），因为导数等于0只有重根，并且原值函数分子分母此时均为0，比较极限可以计算间断点两侧的tan(theta)是相同的，也就是只差了pi。
 
+
 $$
 \psi_{0}=2 \tan ^{-1} \frac{a_{t}}{b_{t}-c_{t}}
 $$
 
+
 通过符号计算（利用at^2+bt^2 = ct^2以及sin(\psi)，cos(\psi）和tan(\psi/2)的关系）分子分母均为0，同时不管是用罗必塔还是求极限，都能证明tan(\psi+\delta)在psi左右值相等，此时也对应肩或肘关节奇异。
+
+
 $$
 \begin{array}
 f_{n}(\psi+\delta) &=a_{n} \sin (\psi+\delta)+b_{n} \cos (\psi+\delta) +c_{n} \\
@@ -313,9 +360,13 @@ f_{n}(\psi+\delta) &=a_{n} \sin (\psi+\delta)+b_{n} \cos (\psi+\delta) +c_{n} \\
 &=\frac{(1+\cos \delta)\left(a_{t} b_{n}-b_{t} a_{n}\right)+c_{t} c_{n} \sin \delta}{(1+\cos \delta)\left(a_{t} b_{d}-b_{t} a_{d}\right)+c_{t} c_{d} \sin \delta}
 \end{array}\\
 $$
+
+
 b) cos, theta2, 6
 
 cos的正常情况是周期性波动，仅存在极少数奇异的情况（导数左右不连续，但是函数值连续），造成该情况的也是肩、肘的奇异。
+
+
 $$
 \cos \theta_{i}=a \sin \psi+b \cos \psi+c \\
 \frac{d \theta_{i}}{d \psi}=-\frac{1}{\sin \theta_{i}}(a \cos \psi-b \sin \psi)
