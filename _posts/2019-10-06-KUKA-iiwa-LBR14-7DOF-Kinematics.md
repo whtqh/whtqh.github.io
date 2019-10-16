@@ -260,6 +260,113 @@ IKforIIWA14(CartesianIIWA,-1,1,1,psi);
 
 Ik solver的精度得到验证的同时，也能看到在基本无关节奇异的情况下，各个关节只受到限幅的影响（+pi~-pi之间的跳变），而在某些情况下则有可能出现限幅范围内的跳变。
 
+#### 奇异以及Joint值函数关于臂角的变化
+
+Singularity 在Chapt. II.E和Chapt. III.A中有详细的讨论：
+
+大致可以按照tan, cos分为两类
+
+a) tan， theta 1,3,5,7，求解公式大致相似：
+$$
+\tan \theta_{i}=\frac{f_{n}(\psi)}{f_{d}(\psi)}\\
+\begin{aligned} 
+f_{n}(\psi) &=a_{n} \sin \psi+b_{n} \cos \psi+c_{n} \\ 
+f_{d}(\psi) &=a_{d} \sin \psi+b_{d} \cos \psi+c_{d} 
+\end{aligned}
+$$
+左右两边各求微分，可以得到\theta关于臂角的导数，从而能够发现导数始终存在
+$$
+\frac{d \theta_{i}}{d \psi}=\frac{a_{t} \sin \psi+b_{t} \cos \psi+c_{t}}{f_{n}^{2}(\psi)+f_{d}^{2}(\psi)} \\
+\begin{aligned} a_{t} &=b_{d} c_{n}-b_{n} c_{d} \\ b_{t} &=a_{n} c_{d}-a_{d} c_{n} \\ c_{t} &=a_{n} b_{d}-a_{d} b_{n} \end{aligned}
+$$
+对at,bt,ct的关系讨论，导数是否存在等于0的情况可以将theta1,3,5,7的值分为三种情况：
+
+- 周期波动（存在不同的导数为0的解）；
+
+$$
+\begin{array}{l}{\psi_{0}^{-}=2 \tan ^{-1} \frac{a_{t}-\sqrt{a_{t}^{2}+b_{t}^{2}-c_{t}^{2}}}{b_{t}-c_{t}}} \\ 
+{\psi_{0}^{+}=2 \tan ^{-1} \frac{a_{t}+\sqrt{a_{t}^{2}+b_{t}^{2}-c_{t}^{2}}}{b_{t}-c_{t}}}\end{array}
+$$
+
+极大值和极小值在以上两个值取到。
+
+- 单调（并在-pi~pi内无间断点）或者 两段单调（pi->-pi的穿越），此时导数始终不等于0；
+- 两段单调单纯的加/减了pi），因为导数等于0只有重根，并且原值函数分子分母此时均为0，比较极限可以计算间断点两侧的tan(theta)是相同的，也就是只差了pi。
+
+$$
+\psi_{0}=2 \tan ^{-1} \frac{a_{t}}{b_{t}-c_{t}}
+$$
+
+通过符号计算（利用at^2+bt^2 = ct^2以及sin(\psi)，cos(\psi）和tan(\psi/2)的关系）分子分母均为0，同时不管是用罗必塔还是求极限，都能证明tan(\psi+\delta)在psi左右值相等，此时也对应肩或肘关节奇异。
+$$
+\begin{array}
+f_{n}(\psi+\delta) &=a_{n} \sin (\psi+\delta)+b_{n} \cos (\psi+\delta) +c_{n} \\
+&=a_{n} (\sin \psi \cos \delta + \cos \psi \sin \delta)+b_{n} (\cos\psi \cos\delta - \sin\psi \sin\delta) +c_{n} \\
+&=\cos\delta(a_{n} \sin \psi+b_{n} \cos \psi+c_{n}) + c_n(1-\cos\delta) + \sin\delta(a_{n} \cos \psi-b_{n} \sin \psi) \\
+&= 0 + c_{n}(1-\cos\delta)+\sin\delta
+(a_{n}\cdot\frac{(b_t-c_t)^2-a_t^2}{(b_t-c_t)^2+a_t^2}
+-b_{n}\cdot\frac{2a_{t}(b_t-c_t)}{(b_t-c_t)^2+a_t^2}
+),  using~a_{t}^2=c_t^2-b_t^2 \\
+&=c_n(1-\cos\delta)+\sin\delta(\frac{(a_{t}b_{n}-a_{n}b_{t})(c_t-b_t)}{c_t(c_t-b_t)})\\
+
+\to \tan{\theta_i} &= \frac{(1+\cos\delta)f_n(\psi)}{(1+\cos\delta)f_d(\psi)} \\
+&=\frac{(1+\cos \delta)\left(a_{t} b_{n}-b_{t} a_{n}\right)+c_{t} c_{n} \sin \delta}{(1+\cos \delta)\left(a_{t} b_{d}-b_{t} a_{d}\right)+c_{t} c_{d} \sin \delta}
+\end{array}\\
+$$
+b) cos, theta2, 6
+
+cos的正常情况是周期性波动，仅存在极少数奇异的情况（导数左右不连续，但是函数值连续），造成该情况的也是肩、肘的奇异。
+$$
+\cos \theta_{i}=a \sin \psi+b \cos \psi+c \\
+\frac{d \theta_{i}}{d \psi}=-\frac{1}{\sin \theta_{i}}(a \cos \psi-b \sin \psi)
+$$
+
+
+c) 对应肩/肘同时奇异的情况（theta2,6导数跳变，而theta1, 3, 5, 7会跳变）
+
+下图中奇异出现在\psi等于0，左右侧的跳变不属于奇异，只是pi和-pi之间的切换。
+
+同时\psi等于0附近的跳变可以通过切换state（一共有八组解：A4（正负），A1~3和A5~7各两组）来减少跳变。
+
+此时IK的计算误差也比较大（Cartesian下误差范数到0.1左右（姿态误差较大，位置在0.01m以内）
+
+![](https://raw.githubusercontent.com/whtqh/image_files/master/Paper_shimizu2008_7-DOF-Redundancy-Singular.png)
+
+![](https://raw.githubusercontent.com/whtqh/image_files/master/Paper_shimizu2008_7-DOF-Redundancy-S-Singular.gif)
+
+奇异的情况下，还容易造成上图所示的跳帧现象（出现多解并且psi连续变化时，关节角不连续）
+
+可以通过解空间的选择（2*2）来尽量规避这个问题，当然前提是需要知道当前的关节角（判断关节空间距离最近），然而当奇异的情况下，theta1,3,5,7可能无法计算（theta2,6=0导致矩阵出现大量0，之前求atan的方法肯定不好使了。一种可行的方法是判断当前Cartesian对应Shoulder或者Wrist已经奇异，并且psi也在奇异的点上时，使用附近的psi去逼近实际的关节角（或者直接用当前位置的关节角也行）。
+
+
+
+```matlab
+%   at = bd * cn - bn * cd;
+%   bt = an * cd - ad * cn;
+%   ct = an * bd - ad * bn;
+at = Bs(1,3) * Cs(2,3) - Bs(2,3) * Cs(1,3);
+bt = As(2,3) * Cs(1,3) - As(1,3) * Cs(2,3);
+ct = As(2,3) * Bs(1,3) - As(1,3) * Bs(2,3);
+
+if(abs(at^2 + bt^2 - ct^2) < 1e-3 && abs(tan(phi / 2) - at / (bt - ct)) < 1e-3 )
+    if(abs(theta2) > 1e-3)
+        theta1 = atan((at * Bs(2,3) - bt * As(2,3)) / (at * Bs(1,3) - bt * As(1,3)));
+    else
+        theta1 = NaN;	% Singular at this psi.
+    end
+else
+    theta1 = atan( (As(2,3) * sin(phi) + Bs(2,3)*cos(phi) + Cs(2,3)) / ...
+    (As(1,3) * sin(phi) + Bs(1,3)*cos(phi) + Cs(1,3)));
+end
+
+```
+
+
+
+![](https://raw.githubusercontent.com/whtqh/image_files/master/Paper_shimizu2008_7-DOF-Redundancy-S-Singular-1.gif)
+
+
+
 因此需要对某个状态下的KUKA进行冗余度分析和冗余范围的确定：
 
 
@@ -267,183 +374,6 @@ Ik solver的精度得到验证的同时，也能看到在基本无关节奇异�
 #### 关节限幅下的可行IK计算
 
 留空...
-
-
-
-#### code(FK&IK)
-
-```matlab
-function CaetesianEEFtoBase = FKforIIWA14(theta,Mlist)
-T01 = Mlist(:,:,1) * ExpScrewZ(theta(1));
-T12 = Mlist(:,:,2) * ExpScrewZ(theta(2));
-T23 = Mlist(:,:,3) * ExpScrewZ(theta(3));
-T34 = Mlist(:,:,4) * ExpScrewZ(theta(4));
-T45 = Mlist(:,:,5) * ExpScrewZ(theta(5));
-T56 = Mlist(:,:,6) * ExpScrewZ(theta(6));
-T67 = Mlist(:,:,7) * ExpScrewZ(theta(7));
-
-CaetesianEEFtoBase = T01 * T12 * T23 * T34 * T45 * T56 * T67 * Mlist(:,:,8);
-
-end
-function TransZ = ExpScrewZ(theta)
-
-    TransZ = eye(4);
-    TransZ(1:3,1:3) = [cos(theta),-sin(theta),0;sin(theta),cos(theta),0;0,0,1];
-    
-end
-```
-
-```matlab
-function [thetaList] = IKforIIWA14(CartesianIIWA,ElbowFlag,ShoulderFlag, WristFlag, ArmAnglePsi)
-%IKforIIWA14 Inverse Kinematics for IIWA14
-%   Example:iiwa_ref =  [ 0.35, 0.3, 0.0,0.5, 0.3, 0.2, 0.7];
-%   CartesianIIWA = FKforIIWA14(iiwa_ref,Mlist);
-%   IKforIIWA14(CartesianIIWA,1,1,-1,0);
-%   Three Flag means 2^3 space with psi
-
-% Given Cartesian Matrix or xyz,rpy
-CartesianIK = CartesianIIWA;
-% Calculate theta4
-R07 = CartesianIK(1:3,1:3);
-
-L_link_1 = 0.1575;
-L_link_2 = 0.2025;
-L_link_3 = 0.2045;
-L_link_4 = 0.2155;
-L_link_5 = 0.1845;
-L_link_6 = 0.2155;
-L_link_7 = 0.081;
-L_link_e = 0.045;
-
-X_sw_0 = CartesianIK(1:3,4) - [0;0;L_link_1 + L_link_2] - R07 * [0;0;L_link_7+ L_link_e];
-X_se_3 = [0,0, L_link_3 + L_link_4]';
-X_ew_4 = [0, L_link_5 + L_link_6,0]';
-
-if(ElbowFlag > 0)
-    theta4 = acos( (norm(X_sw_0)^2 - norm(X_se_3)^2 - norm(X_ew_4)^2) /2/ norm(X_se_3)/norm(X_ew_4));
-else
-    theta4 = -acos( (norm(X_sw_0)^2 - norm(X_se_3)^2 - norm(X_ew_4)^2) /2/ norm(X_se_3)/norm(X_ew_4));
-end
-% Calculate x_sw in {0}
-R34 = [cos(theta4), -sin(theta4),0;0,0,-1;sin(theta4), cos(theta4),0];
-X_sw_3 = X_se_3 + R34 * X_ew_4;
-% solve for theta_1_ini & theta_2_ini
-
-% R_3_ini = [c1c2, -s1, c1s2; s1c2, c1, s1s2; -s2, 0, c2]
-
-% -X_sw_3(1) * s2 + X_sw_3(3) * c2 = X_sw_0(3) ... A sinx + B cosx = C
-alpha = atan2(X_sw_3(1)/ norm([X_sw_3(1),X_sw_3(3)]) , X_sw_3(3)/ norm([X_sw_3(1),X_sw_3(3)]));
-% alpha = atan(-X_sw_3(1)/X_sw_3(3));
-
-theta2_ini = acos(X_sw_0(3) / norm([X_sw_3(1),X_sw_3(3)])) - alpha;
-%sum_s2c2 = cos(theta2_ini) * X_sw_3(1) + sin(theta2_ini) * X_sw_3(3); 
-theta1_ini = atan(X_sw_0(2)/X_sw_0(1));
-if(abs(sin(theta1_ini)*cos(theta2_ini) * X_sw_3(1) + sin(theta1_ini)*sin(theta2_ini) * X_sw_3(3) - X_sw_0(2)) > 1e-3)
-    theta2_ini = -(theta2_ini + alpha) - alpha;
-elseif(abs(cos(theta1_ini)*cos(theta2_ini) * X_sw_3(1) + cos(theta1_ini)*sin(theta2_ini) * X_sw_3(3) - X_sw_0(1)) > 1e-3)
-    theta2_ini = -(theta2_ini + alpha) - alpha;
-end
-
-% Get R_03_ini to cal R_03 and theta1,theta2,theta3
-u_sw_0 =  X_sw_0 / norm(X_sw_0);
-R_03_ini = [cos(theta1_ini) * cos(theta2_ini), -sin(theta1_ini), cos(theta1_ini)*sin(theta2_ini); ...
-    sin(theta1_ini) * cos(theta2_ini), cos(theta1_ini), sin(theta1_ini) * sin(theta2_ini); ...
-    -sin(theta2_ini), 0, cos(theta2_ini)];
-As = VecToso3(u_sw_0) * R_03_ini;
-Bs = -VecToso3(u_sw_0)^2 * R_03_ini;
-Cs = u_sw_0 * u_sw_0' * R_03_ini;
-% As * sin(\phi) + Bs * cos(\phi) + Cs = R_03
-
-phi = ArmAnglePsi;
-theta1 = atan( (As(2,3) * sin(phi) + Bs(2,3)*cos(phi) + Cs(2,3)) / ...
-    (As(1,3) * sin(phi) + Bs(1,3)*cos(phi) + Cs(1,3)));
-%theta2 = + - should be decided by if == theta2_ini when phi = 0.
-if( abs(acos(As(3,3) * sin(0) + Bs(3,3)*cos(0) + Cs(3,3)) - theta2_ini) < 1e-3)
-    theta2 = acos(As(3,3) * sin(phi) + Bs(3,3)*cos(phi) + Cs(3,3));
-else
-    theta2 = - acos(As(3,3) * sin(phi) + Bs(3,3)*cos(phi) + Cs(3,3));
-end
-theta3 = atan(-(As(3,2) * sin(phi) + Bs(3,2)*cos(phi) + Cs(3,2)) / ...
-    (As(3,1) * sin(phi) + Bs(3,1)*cos(phi) + Cs(3,1)));
-
-%double check to change theta2
-if(abs(sin(theta2) * sin(theta3) - (As(3,2) * sin(phi) + Bs(3,2)*cos(phi) + Cs(3,2))) > 1e-3)
-    theta3 = theta3 + pi;
-elseif(abs(-cos(theta3) * sin(theta2) - (As(3,1) * sin(phi) + Bs(3,1)*cos(phi) + Cs(3,1))) > 1e-3)
-    theta3 = theta3 + pi;
-end
-
-if(abs(sin(theta1) * sin(theta2) - (As(2,3) * sin(phi) + Bs(2,3)*cos(phi) + Cs(2,3))) > 1e-3)
-    theta1 = theta1 + pi;
-elseif(abs(cos(theta1) * sin(theta2) - (As(1,3) * sin(phi) + Bs(1,3)*cos(phi) + Cs(1,3))) > 1e-3)
-    theta1 = theta1 + pi;
-end
-
-% ErrorR03 = [cos(theta1)*cos(theta2)*cos(theta3) - sin(theta1)*sin(theta3), ...
-%     -cos(theta1)*cos(theta2)*sin(theta3) - sin(theta1)*cos(theta3), ...
-%     cos(theta1) * sin(theta2); ...
-%     sin(theta1)*cos(theta2)*cos(theta3) + cos(theta1)*sin(theta3), ...
-%     -sin(theta1)*cos(theta2)*sin(theta3) + cos(theta1)*cos(theta3), ...
-%     sin(theta1) * sin(theta2); ...
-%     -cos(theta3) * sin(theta2), sin(theta2) * sin(theta3), cos(theta2)] - ...
-%     (As .* sin(phi) + Bs .* cos(phi) + Cs)
-
-Aw = R34'*As'* R07;
-Bw = R34'*Bs'* R07;
-Cw = R34'*Cs'* R07;
-
-theta5 = atan(-(Aw(3,3) * sin(phi) + Bw(3,3)*cos(phi) + Cw(3,3)) / ...
-    (Aw(1,3) * sin(phi) + Bw(1,3)*cos(phi) + Cw(1,3)));
-% ? + - should be decided by double check
-theta6 =  acos(Aw(2,3) * sin(phi) + Bw(2,3)*cos(phi) + Cw(2,3));
-
-theta7 = atan(-(Aw(2,2) * sin(phi) + Bw(2,2)*cos(phi) + Cw(2,2)) / ...
-    (Aw(2,1) * sin(phi) + Bw(2,1)*cos(phi) + Cw(2,1)));
-if( abs(Aw(1,3) * sin(phi) + Bw(1,3)*cos(phi) + Cw(1,3) - cos(theta5)*sin(theta6)) > 1e-3)
-    theta6 = - theta6;
-end
-
-if( abs(Aw(3,3) * sin(phi) + Bw(3,3)*cos(phi) + Cw(3,3) - -sin(theta5)*sin(theta6)) > 1e-3)
-    theta5 = theta5 + pi;
-elseif( abs(Aw(1,3) * sin(phi) + Bw(1,3)*cos(phi) + Cw(1,3) - cos(theta5)*sin(theta6)) > 1e-3)
-    theta5 = theta5 + pi;
-end
-
-if( abs(Aw(2,2) * sin(phi) + Bw(2,2)*cos(phi) + Cw(2,2) - sin(theta6)*sin(theta7)) > 1e-3)
-    theta7 = theta7 + pi;
-elseif(abs(Aw(2,1) * sin(phi) + Bw(2,1)*cos(phi) + Cw(2,1) - -sin(theta6)*cos(theta7)) > 1e-3)
-    theta7 = theta7 + pi;
-end
-
-
-if(ShoulderFlag > 0)
-else
-    theta1 = theta1 + pi;
-    theta2 = -theta2;
-    theta3 = theta3 + pi;
-end
-if(WristFlag > 0)
-else
-    theta5 = theta5 + pi;
-    theta6 = -theta6;
-    theta7 = theta7 + pi;
-end
-
-thetaList = [theta1;theta2;theta3;theta4;theta5;theta6;theta7];
-
-for i = 1:1:7
-    if(thetaList(i) > pi)
-        thetaList(i) = thetaList(i) - 2 * pi;
-    elseif(thetaList(i) < -pi)
-        thetaList(i) = thetaList(i) + 2 * pi;
-    end
-end
-end
-
-
-```
-
-
 
 
 
