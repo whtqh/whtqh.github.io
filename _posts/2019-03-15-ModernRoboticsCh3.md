@@ -42,10 +42,12 @@ $$
 $$
 p=\begin{bmatrix} p_1 \\ p_2 \\ p_3 \end{bmatrix} \\
 R_{sb}\to [\hat{x}_b,\hat{y}_b, \hat{z}_b]=
-[\hat{x}_s,\hat{y}_s, \hat{z}_s]\begin{bmatrix} r_{11},r_{12},r_{13}\\r_{21},r_{22},r_{23}\\r_{31},r_{32},r_{33}\\ \end{bmatrix} \\
-\to \\
-[\hat{x}_b,\hat{y}_b, \hat{z}_b] _b p_{A} = [\hat{x}_s,\hat{y}_s, \hat{z}_s] (R_{sb}  _b p_{A}) \\
-\to _s p_{A} = R_{sb}  _b p_{A}
+[\hat{x}_s,\hat{y}_s, \hat{z}_s]\begin{bmatrix} r_{11},r_{12},r_{13}\\r_{21},r_{22},r_{23}\\r_{31},r_{32},r_{33}\\ \end{bmatrix} 
+ \\ 
+[\hat{x}_b,\hat{y}_b, \hat{z}_b] ~_bp_{A} = 
+[\hat{x}_s,\hat{y}_s, \hat{z}_s] R_{sb} ~_bp_{A} \\
+\to
+_bp_{A} = R_{sb} ~_bp_{A}
 $$
 
 
