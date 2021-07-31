@@ -47,7 +47,7 @@ R_{sb}\to [\hat{x}_b,\hat{y}_b, \hat{z}_b]=
 [\hat{x}_b,\hat{y}_b, \hat{z}_b] ~_bp_{A} = 
 [\hat{x}_s,\hat{y}_s, \hat{z}_s] R_{sb} ~_bp_{A} \\
 \to
-_bp_{A} = R_{sb} ~_bp_{A}
+_sp_{A} = R_{sb} ~_bp_{A}
 $$
 
 
